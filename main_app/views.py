@@ -1,18 +1,6 @@
 from django.shortcuts import render
-
-# Add the Cat class & list and view function below the imports
-class Dogs:  # Note that parens are optional if not inheriting from another class
-  def __init__(self, name, breed, description, age):
-    self.name = name
-    self.breed = breed
-    self.description = description
-    self.age = age
-
-dogs = [
-  Dogs('Lola', 'English Bulldog', 'always hungry', 3),
-  Dogs('Reno', 'Pitbull', 'full of energy', 2),
-  Dogs('Bud', 'Golden Retriever', 'Movie Star', 4)
-]
+from django.views.generic.edit import CreateView, UpdateView, DeleteView
+from .models import Dog
 
 
 # Add the following import
@@ -26,4 +14,23 @@ def about(request):
   return render(request, 'about.html')
 
 def dogs_index(request):
+  dogs = Dog.objects.all()
   return render(request, 'dogs/index.html', {'dogs': dogs})
+
+def dogs_detail(request, dog_id):
+  dog = Dog.objects.get(id=dog_id)
+  return render(request, 'dogs/detail.html', {'dog': dog})
+
+class DogCreate(CreateView):
+  model = Dog
+  fields = '__all__'
+  success_url = '/dogs/'
+
+class DogUpdate(UpdateView):
+  model = Dog
+  # Let's disallow the renaming of a cat by excluding the name field!
+  fields = ['breed', 'description', 'age']
+
+class DogDelete(DeleteView):
+  model = Dog
+  success_url = '/dogs/'
